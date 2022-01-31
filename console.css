@@ -40,3 +40,10 @@ a {
 ul {
 margin: 0;
 }
+
+img {
+	width: 128px;
+	height: 123px;
+	border-radius: 64px;
+	flex-shrink: 0;
+}
