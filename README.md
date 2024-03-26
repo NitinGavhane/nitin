@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2021 Rushikesh Joshi <rushij.me@gmail.com> <github.com/rushij-me>
+Copyright (c) 2021 Rushikesh Joshi <gavhanenitin911@gmail.com> <github.com/rushij-me>
  
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
