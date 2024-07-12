@@ -26,53 +26,54 @@ THE SOFTWARE.
  * This code is a simplified and unjQuerified version of Typerjs by Sam Phippen, 
  * with the cursor modification by @nitin
  */
-const Typer ={
+const Typer = {
     text: null,
-	accessCountimer:null,
-	index:0, // current cursor position
-	speed:2, // speed of the Typer
-	file:"", //file, must be setted
-	finish:false,
-   
-    init: function(){// inizialize Hacker Typer
-	
+    paragraphs: [], // Array to store paragraphs
+    currentParagraphIndex: 0, // Index of the current paragraph
+    index: 0, // Current cursor position
+    speed: 2, // Speed of the Typer
+    file: "", // File, must be set
+    finish: false,
+
+    init: function () { // Initialize Hacker Typer
         const xhr = new XMLHttpRequest();
         xhr.open("GET", Typer.file);
-        xhr.onreadystatechange = function(data) {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {         
-                Typer.text=xhr.response;
+        xhr.onreadystatechange = function (data) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                Typer.text = xhr.response;
+                Typer.paragraphs = Typer.text.split(/\n\n+/); // Split text into paragraphs
             }
         }
         xhr.send();
-	},
+    },
 
-
-    addText: function(){
-        if(Typer.text){
-            Typer.index+=Typer.speed;
-            let text=Typer.text.substring(0,Typer.index);
-			const rtn= new RegExp("\n", "g");
-            document.getElementById("console").innerHTML = text.replace(rtn,"<br/>");
-            window.scrollBy(0,50); 
+    addText: function () {
+        if (Typer.paragraphs.length > 0 && Typer.currentParagraphIndex < Typer.paragraphs.length) {
+            let text = Typer.paragraphs[Typer.currentParagraphIndex];
+            const rtn = new RegExp("\n", "g");
+            document.getElementById("console").innerHTML += text.replace(rtn, "<br/>") + "<br/><br/>";
+            window.scrollBy(0, 50);
+            Typer.currentParagraphIndex++; // Increment current paragraph index
         }
     },
 
-    blink : function(){
+    blink: function () {
         var cursor = document.getElementById("cursor");
         cursor.classList.toggle("vis");
-    }
-}
+    },
 
-Typer.speed=2;
-Typer.file="data.bio";
+    handleEnter: function (event) { // Handle Enter key press
+        if (event.key === "Enter") {
+            Typer.addText();
+        }
+    }
+};
+
+Typer.speed = 2;
+Typer.file = "data.bio";
 Typer.init();
 
-var timer = setInterval("t();", 30);
-function t() {
-	Typer.addText();
-	if (Typer.text && Typer.index > Typer.text.length) {
-		clearInterval(timer);
-		// inizialize timer for blinking cursor
-		Typer.accessCountimer=setInterval(function(){Typer.updLstChr();},500);
-	}
-}
+document.addEventListener("keydown", Typer.handleEnter); // Event listener for Enter key
+
+var cursorBlinking = setInterval(Typer.blink, 500);
+
