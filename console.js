@@ -26,53 +26,65 @@ THE SOFTWARE.
  * This code is a simplified and unjQuerified version of Typerjs by Sam Phippen, 
  * with the cursor modification by @nitin
  */
-const Typer ={
+const Typer = {
     text: null,
-	accessCountimer:null,
-	index:0, // current cursor position
-	speed:2, // speed of the Typer
-	file:"", //file, must be setted
-	finish:false,
-   
-    init: function(){// inizialize Hacker Typer
-	
+    paragraphs: [], // Array to store paragraphs
+    currentParagraphIndex: 0, // Index of the current paragraph
+    currentParagraphText: "",
+    currentCharIndex: 0, // Current character index within the paragraph
+    speed: 50, // Speed of the Typer (in milliseconds per character)
+    file: "", // File, must be set
+    finish: false,
+
+    init: function () { // Initialize Typer
         const xhr = new XMLHttpRequest();
         xhr.open("GET", Typer.file);
-        xhr.onreadystatechange = function(data) {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {         
-                Typer.text=xhr.response;
+        xhr.onreadystatechange = function (data) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                Typer.text = xhr.response;
+                Typer.paragraphs = Typer.text.split(/\n\n+/); // Split text into paragraphs
+                Typer.displayNextParagraph(); // Display the first paragraph
             }
         }
         xhr.send();
-	},
+    },
 
-
-    addText: function(){
-        if(Typer.text){
-            Typer.index+=Typer.speed;
-            let text=Typer.text.substring(0,Typer.index);
-			const rtn= new RegExp("\n", "g");
-            document.getElementById("console").innerHTML = text.replace(rtn,"<br/>");
-            window.scrollBy(0,50); 
+    displayNextParagraph: function () {
+        if (Typer.currentParagraphIndex < Typer.paragraphs.length) {
+            Typer.currentParagraphText = Typer.paragraphs[Typer.currentParagraphIndex];
+            Typer.currentCharIndex = 0;
+            Typer.type();
         }
     },
 
-    blink : function(){
+    type: function () {
+        if (Typer.currentCharIndex < Typer.currentParagraphText.length) {
+            let char = Typer.currentParagraphText.charAt(Typer.currentCharIndex);
+            document.getElementById("console").innerHTML += char === "\n" ? "<br/>" : char;
+            Typer.currentCharIndex++;
+            setTimeout(Typer.type, Typer.speed);
+        } else {
+            Typer.currentParagraphIndex++;
+            document.getElementById("console").innerHTML += "<br/><br/>";
+        }
+    },
+
+    handleKeydown: function (event) { // Handle any key press
+        if (Typer.currentCharIndex >= Typer.currentParagraphText.length) {
+            Typer.displayNextParagraph();
+        }
+    },
+
+    blink: function () {
         var cursor = document.getElementById("cursor");
         cursor.classList.toggle("vis");
     }
-}
+};
 
-Typer.speed=2;
-Typer.file="data.bio";
+Typer.speed = 50; // Speed of typing in milliseconds
+Typer.file = "data.bio";
 Typer.init();
 
-var timer = setInterval("t();", 30);
-function t() {
-	Typer.addText();
-	if (Typer.text && Typer.index > Typer.text.length) {
-		clearInterval(timer);
-		// inizialize timer for blinking cursor
-		Typer.accessCountimer=setInterval(function(){Typer.updLstChr();},500);
-	}
-}
+document.addEventListener("keydown", Typer.handleKeydown); // Event listener for any key press
+
+var cursorBlinking = setInterval(Typer.blink, 500);
