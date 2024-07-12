@@ -30,18 +30,18 @@ const Typer = {
     text: null,
     paragraphs: [], // Array to store paragraphs
     currentParagraphIndex: 0, // Index of the current paragraph
-    index: 0, // Current cursor position
     speed: 2, // Speed of the Typer
     file: "", // File, must be set
     finish: false,
 
-    init: function () { // Initialize Hacker Typer
+    init: function () { // Initialize Typer
         const xhr = new XMLHttpRequest();
         xhr.open("GET", Typer.file);
         xhr.onreadystatechange = function (data) {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 Typer.text = xhr.response;
                 Typer.paragraphs = Typer.text.split(/\n\n+/); // Split text into paragraphs
+                Typer.addText(); // Display the first paragraph
             }
         }
         xhr.send();
@@ -62,10 +62,8 @@ const Typer = {
         cursor.classList.toggle("vis");
     },
 
-    handleEnter: function (event) { // Handle Enter key press
-        if (event.key === "Enter") {
-            Typer.addText();
-        }
+    handleKeydown: function (event) { // Handle any key press
+        Typer.addText();
     }
 };
 
@@ -73,7 +71,6 @@ Typer.speed = 2;
 Typer.file = "data.bio";
 Typer.init();
 
-document.addEventListener("keydown", Typer.handleEnter); // Event listener for Enter key
+document.addEventListener("keydown", Typer.handleKeydown); // Event listener for any key press
 
 var cursorBlinking = setInterval(Typer.blink, 500);
-
