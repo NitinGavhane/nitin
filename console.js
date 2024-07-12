@@ -30,6 +30,8 @@ const Typer = {
     text: null,
     paragraphs: [], // Array to store paragraphs
     currentParagraphIndex: 0, // Index of the current paragraph
+    currentParagraphText: "",
+    currentCharIndex: 0, // Current character index within the paragraph
     speed: 2, // Speed of the Typer
     file: "", // File, must be set
     finish: false,
@@ -41,33 +43,45 @@ const Typer = {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 Typer.text = xhr.response;
                 Typer.paragraphs = Typer.text.split(/\n\n+/); // Split text into paragraphs
-                Typer.addText(); // Display the first paragraph
+                Typer.displayNextParagraph(); // Display the first paragraph
             }
         }
         xhr.send();
     },
 
-    addText: function () {
-        if (Typer.paragraphs.length > 0 && Typer.currentParagraphIndex < Typer.paragraphs.length) {
-            let text = Typer.paragraphs[Typer.currentParagraphIndex];
-            const rtn = new RegExp("\n", "g");
-            document.getElementById("console").innerHTML += text.replace(rtn, "<br/>") + "<br/><br/>";
-            window.scrollBy(0, 50);
-            Typer.currentParagraphIndex++; // Increment current paragraph index
+    displayNextParagraph: function () {
+        if (Typer.currentParagraphIndex < Typer.paragraphs.length) {
+            Typer.currentParagraphText = Typer.paragraphs[Typer.currentParagraphIndex];
+            Typer.currentCharIndex = 0;
+            Typer.type();
+        }
+    },
+
+    type: function () {
+        if (Typer.currentCharIndex < Typer.currentParagraphText.length) {
+            let char = Typer.currentParagraphText.charAt(Typer.currentCharIndex);
+            document.getElementById("console").innerHTML += char === "\n" ? "<br/>" : char;
+            Typer.currentCharIndex++;
+            setTimeout(Typer.type, Typer.speed);
+        } else {
+            Typer.currentParagraphIndex++;
+            document.getElementById("console").innerHTML += "<br/><br/>";
+        }
+    },
+
+    handleKeydown: function (event) { // Handle any key press
+        if (Typer.currentCharIndex >= Typer.currentParagraphText.length) {
+            Typer.displayNextParagraph();
         }
     },
 
     blink: function () {
         var cursor = document.getElementById("cursor");
         cursor.classList.toggle("vis");
-    },
-
-    handleKeydown: function (event) { // Handle any key press
-        Typer.addText();
     }
 };
 
-Typer.speed = 2;
+Typer.speed = 30; // Speed of typing in milliseconds
 Typer.file = "data.bio";
 Typer.init();
 
