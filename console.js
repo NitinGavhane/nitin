@@ -26,93 +26,53 @@ THE SOFTWARE.
  * This code is a simplified and unjQuerified version of Typerjs by Sam Phippen, 
  * with the cursor modification by @nitin
  */
-const Typer = {
-    text: "", // Entire text content from data.bio file
-    paragraphs: [], // Array to hold paragraphs split by newlines
-    currentParagraphIndex: 0, // Index to track the current paragraph
-    currentCharIndex: 0, // Index to track the current character within a paragraph
-    speed: 50, // Typing speed (milliseconds)
-    isTyping: false, // Track whether typing is happening
-    cursorBlinkInterval: null, // For cursor blinking
-
-    init: function () {
-        this.loadText(); // Load the text from the file
-        this.cursorBlink(); // Start the blinking cursor
-        this.handleKeyPress(); // Add event listener for "Enter" key
-    },
-
-    loadText: function () {
-        // Load the text from the data.bio file (simulating an external file)
+const Typer ={
+    text: null,
+	accessCountimer:null,
+	index:0, // current cursor position
+	speed:2, // speed of the Typer
+	file:"", //file, must be setted
+	finish:false,
+   
+    init: function(){// inizialize Hacker Typer
+	
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", Typer.file, true);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                Typer.text = xhr.response;
-                Typer.paragraphs = Typer.text.split("\n\n"); // Split text into paragraphs (assuming two newlines)
-                Typer.displayNextParagraph(); // Start displaying the first paragraph
+        xhr.open("GET", Typer.file);
+        xhr.onreadystatechange = function(data) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {         
+                Typer.text=xhr.response;
             }
-        };
+        }
         xhr.send();
-    },
+	},
 
-    displayNextParagraph: function () {
-        if (this.currentParagraphIndex < this.paragraphs.length) {
-            const consoleDiv = document.getElementById("console");
-            const paragraph = this.paragraphs[this.currentParagraphIndex];
-            this.isTyping = true;
-            this.currentCharIndex = 0;
-            consoleDiv.innerHTML += `<br/><br/>`; // Add space before the next paragraph
-            this.typeParagraph(paragraph);
-        } else {
-            this.isTyping = false;
+
+    addText: function(){
+        if(Typer.text){
+            Typer.index+=Typer.speed;
+            let text=Typer.text.substring(0,Typer.index);
+			const rtn= new RegExp("\n", "g");
+            document.getElementById("console").innerHTML = text.replace(rtn,"<br/>");
+            window.scrollBy(0,50); 
         }
     },
 
-    typeParagraph: function (paragraph) {
-        const consoleDiv = document.getElementById("console");
-
-        if (this.currentCharIndex < paragraph.length) {
-            consoleDiv.innerHTML += paragraph.charAt(this.currentCharIndex);
-            this.currentCharIndex++;
-            setTimeout(() => this.typeParagraph(paragraph), this.speed);
-        } else {
-            this.isTyping = false;
-            this.currentParagraphIndex++;
-        }
-    },
-
-    skipCurrentParagraph: function () {
-        const consoleDiv = document.getElementById("console");
-
-        // If typing is in progress, immediately display the rest of the paragraph
-        if (this.isTyping) {
-            const paragraph = this.paragraphs[this.currentParagraphIndex];
-            consoleDiv.innerHTML += paragraph.slice(this.currentCharIndex); // Display the remaining part
-            this.isTyping = false;
-            this.currentParagraphIndex++;
-        }
-
-        this.displayNextParagraph(); // Move to the next paragraph
-    },
-
-    cursorBlink: function () {
-        this.cursorBlinkInterval = setInterval(() => {
-            const cursor = document.getElementById("cursor");
-            cursor.classList.toggle("vis");
-        }, 500); // blinking every 500 milliseconds
-    },
-
-    handleKeyPress: function () {
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") {
-                Typer.skipCurrentParagraph(); // Skip current paragraph on Enter press
-            }
-        });
+    blink : function(){
+        var cursor = document.getElementById("cursor");
+        cursor.classList.toggle("vis");
     }
-};
+}
 
-Typer.file = "data.bio"; // Path to the file
-window.onload = function () {
-    Typer.init(); // Initialize when page loads
-};
+Typer.speed=2;
+Typer.file="data.bio";
+Typer.init();
 
+var timer = setInterval("t();", 30);
+function t() {
+	Typer.addText();
+	if (Typer.text && Typer.index > Typer.text.length) {
+		clearInterval(timer);
+		// inizialize timer for blinking cursor
+		Typer.accessCountimer=setInterval(function(){Typer.updLstChr();},500);
+	}
+}
