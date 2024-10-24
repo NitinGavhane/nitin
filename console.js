@@ -28,71 +28,56 @@ THE SOFTWARE.
  */
 const Typer = {
     text: null,
-	accessCountimer: null,
-	index: 0, // current cursor position
-	speed: 2, // speed of the Typer
-	file: "", // file, must be set
-	finish: false,
-	
-	init: function() { // initialize Hacker Typer
-		const xhr = new XMLHttpRequest();
-		xhr.open("GET", Typer.file);
-		xhr.onreadystatechange = function(data) {
-			if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-				Typer.text = xhr.response;
-			}
-		}
-		xhr.send();
-	},
+    index: 0, // current cursor position
+    speed: 2, // speed of the Typer
+    file: "", // file, must be set
+    timer: null, // stores the typing timer
+    finish: false,
+    
+    init: function() { // initialize Hacker Typer
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", Typer.file);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                Typer.text = xhr.response;
+            }
+        };
+        xhr.send();
+    },
 
-	addText: function() {
-		if (Typer.text) {
-			Typer.index += Typer.speed;
-			let text = Typer.text.substring(0, Typer.index);
-			const rtn = new RegExp("\n", "g");
-			document.getElementById("console").innerHTML = text.replace(rtn, "<br/>");
-			window.scrollBy(0, 50);
-		}
-	},
+    addText: function() {
+        if (Typer.text) {
+            Typer.index += Typer.speed;
+            let text = Typer.text.substring(0, Typer.index);
+            const rtn = new RegExp("\n", "g");
+            document.getElementById("console").innerHTML = text.replace(rtn, "<br/>");
+            window.scrollBy(0, 50);
+        }
+    },
 
-	blink: function() {
-		var cursor = document.getElementById("cursor");
-		cursor.classList.toggle("vis");
-	},
-
-	// Stop Typer effect and display the full remaining text
-	displayFullText: function() {
-		if (Typer.text) {
-			// Immediately display the entire content
-			Typer.index = Typer.text.length;
-			let fullText = Typer.text;
-			const rtn = new RegExp("\n", "g");
-			document.getElementById("console").innerHTML = fullText.replace(rtn, "<br/>");
-			clearInterval(timer); // Stop the typing interval
-			clearInterval(Typer.accessCountimer); // Stop the cursor blinking timer
-		}
-	}
-}
+    displayFullText: function() {
+        if (Typer.text) {
+            // Display the full text instantly
+            Typer.index = Typer.text.length;
+            let fullText = Typer.text;
+            const rtn = new RegExp("\n", "g");
+            document.getElementById("console").innerHTML = fullText.replace(rtn, "<br/>");
+            clearInterval(Typer.timer); // Stop the typing interval
+        }
+    }
+};
 
 Typer.speed = 2;
 Typer.file = "data.bio";
 Typer.init();
 
-// Timer for adding text at an interval
-var timer = setInterval(function() { t(); }, 30);
-function t() {
-	Typer.addText();
-	if (Typer.text && Typer.index > Typer.text.length) {
-		clearInterval(timer);
-		Typer.accessCountimer = setInterval(function() { Typer.blink(); }, 500);
-	}
-}
+// Start the typing effect with a timer
+Typer.timer = setInterval(function() { Typer.addText(); }, 30);
 
-// Listen for Enter key press to stop Typer and display full content
+// Listen for the "Enter" key press to display all content at once
 document.addEventListener("keydown", function(event) {
-	if (event.key === "Enter") {
-		Typer.displayFullText();
-	}
+    if (event.key === "Enter") {
+        Typer.displayFullText(); // Display full text when Enter is pressed
+    }
 });
-
 
