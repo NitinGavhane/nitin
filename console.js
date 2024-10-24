@@ -29,7 +29,7 @@ THE SOFTWARE.
 const Typer = {
     text: null,
     index: 0, // current cursor position
-    speed: 4, // speed of the Typer
+    speed: 2, // speed of the Typer
     file: "", // file, must be set
     timer: null, // stores the typing timer
     finish: false,
@@ -67,7 +67,7 @@ const Typer = {
     }
 };
 
-Typer.speed = 2;
+Typer.speed = 4;
 Typer.file = "data.bio";
 Typer.init();
 
