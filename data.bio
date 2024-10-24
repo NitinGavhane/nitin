@@ -4,6 +4,12 @@
 <div style="display:flex;flex-direction:row;">
     <div>
         <h2> Nitin Gavhane </h2> 
+        <!-- Profile Picture -->
+        <div style="text-align:center;">
+            <img src="https://raw.githubusercontent.com/NitinGavhane/nitin/main/profilePic.jpg" 
+                 alt="Nitin Gavhane Profile Picture" style="border-radius:50%; width:150px; height:150px;">
+        </div>
+
         <a href="https://github.com/NitinGavhane" target="_blank" rel="noopener noreferrer">Github</a> | <a href="https://www.linkedin.com/in/nitinsgavhane/" target="_blank" rel="noopener noreferrer">Linkedin</a> | <a href="https://medium.com/@nitinsgavane" target="_blank" rel="noopener noreferrer">Medium</a>
     
         Working as a Software Developer Engineer(SDE) and an additional 4+ years of freelancing expertise in Cyber Security Testing, Tactical Solution Development, AWS Cloud, Business Analytics, and Solution Architecture, I have demonstrated a proven track record of successful collaboration with over 100 clients globally through Bugcrowd and an outsourcing Opensource Industry.
