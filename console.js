@@ -67,7 +67,7 @@ const Typer = {
     }
 };
 
-Typer.speed = 4;
+Typer.speed = 5;
 Typer.file = "data.bio";
 Typer.init();
 
